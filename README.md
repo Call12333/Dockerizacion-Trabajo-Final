@@ -1,6 +1,7 @@
 # 🔐 CyberBlue Security Portal
 
 CyberBlue Security Portal es una aplicación web diseñada para simular un entorno de **Security Cloud**, permitiendo la gestión de usuarios, interacción con APIs y pruebas de seguridad en un entorno moderno.
+<img width="1920" height="1080" alt="Captura de pantalla (3136)" src="https://github.com/user-attachments/assets/e27cce6c-0a05-4029-8a4b-e5241d656701" />
 
 ## 🚀 Tecnologías
 
