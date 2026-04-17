@@ -41,3 +41,5 @@ http://localhost:3000
 Proyecto desarrollado con fines educativos enfocados en ciberseguridad y análisis de aplicaciones.
 
 ---
+Imagen Docker:
+  https://hub.docker.com/r/aggelosx/cyberblue-app
