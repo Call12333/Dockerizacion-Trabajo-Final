@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - SESSION_SECRET=cyberblue-y2k-secret-key-2004
+      - GEMINI_API_KEY=AQ.Ab8RN6JebNfLSNiEmECdVs39jzBXyOh7DA25Wc19L6th2_noyw
+    restart: always

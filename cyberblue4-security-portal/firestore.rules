@@ -1,0 +1,107 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Document ID: {userId}
+// Fields:
+//   - uid: string (required, immutable)
+//   - email: string (required, format: email)
+//   - displayName: string (optional)
+//   - role: string (required, enum: ['admin', 'user'])
+//   - createdAt: timestamp (required, immutable)
+//
+// Collection: logs
+// Document ID: {logId}
+// Fields:
+//   - userId: string (required, immutable)
+//   - action: string (required)
+//   - timestamp: timestamp (required, immutable)
+//   - details: string (optional)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "rompecraneos302@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             data.role in ['admin', 'user'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidLog(data) {
+      return data.keys().hasAll(['userId', 'action', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.action is string && data.action.size() > 0 && data.action.size() < 200 &&
+             data.timestamp is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Users can only read their own profile, or admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can create their own profile as 'user' role
+      // Admins can create any profile
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    ( (isOwner(userId) && request.resource.data.role == 'user') || isAdmin() );
+      
+      // Users can update their own profile but NOT their role
+      // Admins can update anything
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    ( (isOwner(userId) && request.resource.data.role == resource.data.role && request.resource.data.uid == resource.data.uid) || isAdmin() );
+    }
+
+    match /logs/{logId} {
+      // Only admins can read logs
+      allow read: if isAdmin();
+      
+      // Any authenticated user can create a log for themselves
+      allow create: if isAuthenticated() && isValidLog(request.resource.data);
+      
+      // Logs are immutable
+      allow update, delete: if false;
+    }
+
+    match /services/{serviceId} {
+      // All authenticated users can read services
+      allow read: if isAuthenticated();
+      
+      // Only admins can modify services
+      allow write, update, delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile information for the security portal.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user." },
+        "email": { "type": "string", "format": "email", "description": "User's email address." },
+        "displayName": { "type": "string", "description": "User's display name." },
+        "role": { "type": "string", "enum": ["admin", "user"], "description": "User's role in the system." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the user profile was created." }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Log": {
+      "title": "Security Log",
+      "description": "A record of security events or actions.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID of the user who performed the action." },
+        "action": { "type": "string", "description": "The action performed." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the action occurred." },
+        "details": { "type": "string", "description": "Additional details about the action." }
+      },
+      "required": ["userId", "action", "timestamp"]
+    },
+    "Service": {
+      "title": "Node Service",
+      "description": "Description of a security service offered by the node.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the service." },
+        "description": { "type": "string", "description": "Brief description of the service." },
+        "icon": { "type": "string", "description": "Lucide icon name." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp." }
+      },
+      "required": ["title", "description"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles."
+    },
+    "/logs/{logId}": {
+      "schema": "Log",
+      "description": "Collection of security logs."
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Collection of security services."
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "CyberBlue Security Portal",
+  "description": "A secure web application with a Y2K aesthetic, featuring Firebase authentication and Firestore integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
